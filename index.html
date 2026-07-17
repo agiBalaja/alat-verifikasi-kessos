@@ -1,1 +1,363 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alat verifikasi kegiatan Lansia</title>
+  <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #f5f5f7;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h2 { text-align: center; color: #007aff; }
+
+        .form-group { margin-bottom: 15px; }
+        
+        .input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="file"], select, button {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        /* Styling tombol input file palsu agar rapi */
+        .file-btn {
+            background-color: #e5e5ea;
+            color: #333;
+            text-align: center;
+            line-height: 20px;
+            display: inline-block;
+            cursor: pointer;
+            font-weight: 500;
+            border-radius: 6px;
+            padding: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            border: none;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-download { background-color: #007aff; }
+        .btn-wa { background-color: #25d366; }
+
+        .canvas-container {
+            position: relative;
+            margin-top: 20px;
+            background: #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas { max-width: 100%; height: auto; cursor: move; }
+        .hint { font-size: 12px; color: #666; text-align: center; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Alat verifikasi kegiatan Lansia</h2>
+    
+    <!-- Modifikasi 2: Pemisahan Input Kamera dan Galeri -->
+    <div class="form-group">
+        <label style="font-weight:600; display:block; margin-bottom:5px;">Sumber Gambar</label>
+        <div class="input-row">
+            <label class="file-btn">
+                📸 Ambil Kamera
+                <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+            </label>
+            <label class="file-btn">
+                📁 Buka Galeri
+                <input type="file" id="galleryInput" accept="image/*" style="display:none;">
+            </label>
+        </div>
+    </div>
+
+    <!-- Modifikasi 1: Dropdown Alas Teks (4 Opsi Desain) -->
+    <div class="form-group">
+        <label style="font-weight:600; display:block; margin-bottom:5px;">Pilih Gaya Latar Teks</label>
+        <select id="styleSelect">
+            <option value="orange">Kotak Jingga (Membantu Lansia)</option>
+            <option value="red">Kotak Merah (Bersama Lansia!)</option>
+            <option value="yellow-media">Kotak Kuning (Kegiatan hari inj)</option>
+            <option value="yellow-corner">Siku Kuning L-Shape</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label style="font-weight:600; display:block; margin-bottom:5px;">Pilih Aktivitas</label>
+        <select id="captionSelect">
+            <option value="Memeriksa Tekanan Darah">Memeriksa Tekanan Darah</option>
+            <option value="mengingatkan minum obat">Mengingatkan minum obat</option>
+            <option value="membantu mandi">Membantu mandi</option>
+            <option value="berpakaian dan makan">Berpakaian dan makan</option>
+            <option value="membantu menyiapkan makanan">Membantu menyiapkan makanan</option>
+            <option value="mengawasi pola makan">Mengawasi pola makan</option>
+            <option value="mengingatkan waktu makan">Mengingatkan waktu makan</option>
+            <option value="mendampingi senam ringan atau peregangan">Mendampingi senam ringan atau peregangan</option>
+            <option value="latihan gerak">Latihan gerak</option>
+            <option value="membantu berjalan didalam rumah">Membantu berjalan didalam rumah</option>
+            <option value="pendampingan penggunaan alat bantu">Pendampingan penggunaan alat bantu</option>
+            <option value="membersihkan area tempat tidur dan kamar">Membersihkan area tempat tidur dan kamar</option>
+            <option value="menjaga rumah tetap aman dan nyaman">Menjaga rumah tetap aman dan nyaman</option>
+            <option value="menata barang agar mudah dijangkau">Menata barang agar mudah dijangkau</option>
+        </select>
+    </div>
+
+    <div class="canvas-container">
+        <canvas id="imageCanvas"></canvas>
+    </div>
+    <p class="hint" id="hintText" style="display:none;">*Sentuh dan geser teks untuk mengatur posisi</p>
+
+    <button id="downloadBtn" class="btn-download" style="display:none;">Unduh Gambar</button>
+    <button id="whatsappBtn" class="btn-wa" style="display:none;">Bagikan ke WhatsApp</button>
+</div>
+
+<script>
+    const cameraInput = document.getElementById('cameraInput');
+    const galleryInput = document.getElementById('galleryInput');
+    const captionSelect = document.getElementById('captionSelect');
+    const styleSelect = document.getElementById('styleSelect');
+    const canvas = document.getElementById('imageCanvas');
+    const ctx = canvas.getContext('2d');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const whatsappBtn = document.getElementById('whatsappBtn');
+    const hintText = document.getElementById('hintText');
+
+    let img = new Image();
+    let textX, textY;
+    let isDragging = false;
+    let startX, startY;
+    let currentText = captionSelect.value;
+    let currentStyle = styleSelect.value;
+
+    // Handler untuk membaca file input
+    function handleFile(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => { img.src = event.target.result; };
+        reader.readAsDataURL(file);
+    }
+
+    cameraInput.addEventListener('change', handleFile);
+    galleryInput.addEventListener('change', handleFile);
+
+    img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        // Penempatan awal box teks di tengah bawah
+        textX = canvas.width / 2;
+        textY = canvas.height - (canvas.height * 0.15);
+        drawCanvas();
+        downloadBtn.style.display = 'block';
+        whatsappBtn.style.display = 'block';
+        hintText.style.display = 'block';
+    };
+
+    captionSelect.addEventListener('change', (e) => { currentText = e.target.value; if(img.src) drawCanvas(); });
+    styleSelect.addEventListener('change', (e) => { currentStyle = e.target.value; if(img.src) drawCanvas(); });
+
+    // Modifikasi 3: Fungsi memisahkan baris teks secara otomatis jika terlalu panjang
+    function wrapText(text, maxChars) {
+        if (text.length <= maxChars) return [text];
+        let words = text.split(' ');
+        let lines = [];
+        let currentLine = '';
+
+        words.forEach(word => {
+            if ((currentLine + word).length > maxChars) {
+                lines.push(currentLine.trim());
+                currentLine = word + ' ';
+            } else {
+                currentLine += word + ' ';
+            }
+        });
+        if (currentLine) lines.push(currentLine.trim());
+        return lines;
+    }
+
+    function drawCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // Pengaturan skala font dinamis
+        const baseSize = Math.max(28, Math.floor(canvas.width * 0.045));
+        ctx.font = `bold ${baseSize}px sans-serif`;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+
+        // Split teks ke maksimal 2 baris
+        const lines = wrapText(currentText, 30);
+        
+        // Kalkulasi dimensi komponen
+        const paddingX = 4;
+        const paddingY = 30;
+        const lineHeight = baseSize * 1.3;
+        
+        let maxLineWidth = 0;
+        lines.forEach(line => {
+            const w = ctx.measureText(line).width;
+            if (w > maxLineWidth) maxLineWidth = w;
+        });
+
+        const boxWidth = maxLineWidth + (paddingX * 2);
+        const boxHeight = (lines.length * lineHeight) + (paddingY * 2);
+
+        // Titik patokan kiri atas dari box utama (dihitung dari titik drag tengah)
+        const boxLeft = textX - (boxWidth / 2);
+        const boxTop = textY - (boxHeight / 2);
+
+        // --- Modifikasi 1: Menggambar Alas Teks Berdasarkan Pilihan Opsi ---
+        ctx.save();
+
+        if (currentStyle === 'yellow-corner') {
+            // Opsi 4: Siku Kuning L-Shape di belakang box putih
+            ctx.fillStyle = '#f2a900';
+            const thickness = 18;
+            ctx.fillRect(boxLeft - thickness, boxTop - thickness, boxWidth + thickness, boxHeight + thickness);
+            // Box Putih Utama
+            ctx.fillStyle = 'white';
+            ctx.fillRect(boxLeft, boxTop, boxWidth, boxHeight);
+        } else {
+            // Opsi 1, 2, 3: Menggunakan Label Top-Left di atas Box Putih
+            ctx.fillStyle = 'white';
+            ctx.fillRect(boxLeft, boxTop, boxWidth, boxHeight);
+
+            let badgeText = '';
+            let badgeColor = '';
+
+            if (currentStyle === 'orange') {
+                badgeText = 'Bersama Lansia';
+                badgeColor = '#e65100';
+            } else if (currentStyle === 'red') {
+                badgeText = 'Membantu Lansia!';
+                badgeColor = '#b71c1c';
+            } else if (currentStyle === 'yellow-media') {
+                badgeText = 'Kegiatan Lansia';
+                badgeColor = '#f2a900';
+            }
+
+            // Gambar Kotak Badge Label kecil di atas
+            const badgeFontSize = Math.max(16, Math.floor(baseSize * 0.55));
+            ctx.font = `bold ${badgeFontSize}px sans-serif`;
+            const badgeWidth = ctx.measureText(badgeText).width + 30;
+            const badgeHeight = badgeFontSize + 16;
+
+            ctx.fillStyle = badgeColor;
+            ctx.fillRect(boxLeft, boxTop - badgeHeight, badgeWidth, badgeHeight);
+
+            // Teks di dalam Badge
+            ctx.fillStyle = currentStyle === 'yellow-media' ? 'black' : 'white';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(badgeText, boxLeft + (badgeWidth / 2), boxTop - (badgeHeight / 2));
+        }
+
+        ctx.restore();
+
+        // --- MENGGAMBAR TEKS UTAMA (Di dalam box putih) ---
+        ctx.font = `bold ${baseSize}px sans-serif`;
+        ctx.fillStyle = '#111111';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+
+        lines.forEach((line, index) => {
+            ctx.fillText(line, boxLeft + paddingX, boxTop + paddingY + (index * lineHeight));
+        });
+
+        // Menyimpan deteksi area drag koordinat bounding box aktual
+        canvas.currentBox = {
+            left: boxLeft - 20,
+            top: boxTop - 40,
+            right: boxLeft + boxWidth + 20,
+            bottom: boxTop + boxHeight + 20
+        };
+    }
+
+    // --- LOGIKA DRAG MOUSE & TOUCH ---
+    function getCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+        const clientY = e.clientY || (e.touches ? e.touches[0].clientY : 0);
+        return { x: (clientX - rect.left) * (canvas.width / rect.width), y: (clientY - rect.top) * (canvas.height / rect.height) };
+    }
+
+    function isInsideBox(c) {
+        if (!canvas.currentBox) return false;
+        return (c.x >= canvas.currentBox.left && c.x <= canvas.currentBox.right && c.y >= canvas.currentBox.top && c.y <= canvas.currentBox.bottom);
+    }
+
+    canvas.addEventListener('mousedown', (e) => { 
+        const c = getCoords(e); 
+        if(isInsideBox(c)) { isDragging = true; startX = c.x - textX; startY = c.y - textY; }
+    });
+    window.addEventListener('mousemove', (e) => { 
+        if (isDragging) { const c = getCoords(e); textX = c.x - startX; textY = c.y - startY; drawCanvas(); }
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    
+    canvas.addEventListener('touchstart', (e) => { 
+        const c = getCoords(e); 
+        if(isInsideBox(c)) { isDragging = true; startX = c.x - textX; startY = c.y - textY; e.preventDefault(); }
+    }, {passive: false});
+    canvas.addEventListener('touchmove', (e) => { 
+        if (isDragging) { e.preventDefault(); const c = getCoords(e); textX = c.x - startX; textY = c.y - startY; drawCanvas(); }
+    }, {passive: false});
+    canvas.addEventListener('touchend', () => { isDragging = false; });
+
+    // --- DOWNLOAD & WHATSAPP SHARE ---
+    downloadBtn.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = 'caption_image.jpg';
+        link.href = canvas.toDataURL('image/jpeg', 0.9);
+        link.click();
+    });
+
+    whatsappBtn.addEventListener('click', async () => {
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'caption_image.jpg', { type: 'image/jpeg' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({ files: [file], title: 'Foto Kegiatan', text: currentText });
+                } catch (err) { console.error(err); }
+            } else {
+                alert("Browser tidak mendukung berbagi langsung. Silakan unduh gambar dulu.");
+            }
+        }, 'image/jpeg');
+    });
+</script>
+
+</body>
+</html>
