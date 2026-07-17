@@ -1,0 +1,16 @@
+{
+  "short_name": "Verifikasi Lansia",
+  "name": "Alat Verifikasi Kegiatan Lansia",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3076/3076753.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "background_color": "#f5f5f7",
+  "theme_color": "#007aff",
+  "display": "standalone",
+  "orientation": "portrait"
+}
