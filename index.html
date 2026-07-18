@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alat verifikasi kegiatan Lansia</title>
+    <title>Alat verifikasi kegiatan Komponen kessos</title>
     
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-DV25BYV3TL"></script>
   <script>
@@ -117,9 +117,9 @@
     <div class="form-group">
         <label style="font-weight:600; display:block; margin-bottom:5px;">Pilih Gaya Latar Teks</label>
         <select id="styleSelect">
-            <option value="orange">Kotak Jingga (Membantu Lansia)</option>
-            <option value="red">Kotak Merah (Bersama Lansia!)</option>
-            <option value="yellow-media">Kotak Kuning (Kegiatan hari inj)</option>
+            <option value="orange">Kotak Jingga (Membantu Lansia/Disabel)</option>
+            <option value="red">Kotak Merah (Bersama Lansia/Disable!)</option>
+            <option value="yellow-media">Kotak Kuning (Kegiatan hari ini)</option>
             <option value="yellow-corner">Siku Kuning L-Shape</option>
         </select>
     </div>
@@ -128,19 +128,19 @@
         <label style="font-weight:600; display:block; margin-bottom:5px;">Pilih Aktivitas</label>
         <select id="captionSelect">
             <option value="Memeriksa Tekanan Darah">Memeriksa Tekanan Darah</option>
-            <option value="mengingatkan minum obat">Mengingatkan minum obat</option>
-            <option value="membantu mandi">Membantu mandi</option>
-            <option value="berpakaian dan makan">Berpakaian dan makan</option>
-            <option value="membantu menyiapkan makanan">Membantu menyiapkan makanan</option>
-            <option value="mengawasi pola makan">Mengawasi pola makan</option>
-            <option value="mengingatkan waktu makan">Mengingatkan waktu makan</option>
-            <option value="mendampingi senam ringan atau peregangan">Mendampingi senam ringan atau peregangan</option>
-            <option value="latihan gerak">Latihan gerak</option>
-            <option value="membantu berjalan didalam rumah">Membantu berjalan didalam rumah</option>
-            <option value="pendampingan penggunaan alat bantu">Pendampingan penggunaan alat bantu</option>
-            <option value="membersihkan area tempat tidur dan kamar">Membersihkan area tempat tidur dan kamar</option>
-            <option value="menjaga rumah tetap aman dan nyaman">Menjaga rumah tetap aman dan nyaman</option>
-            <option value="menata barang agar mudah dijangkau">Menata barang agar mudah dijangkau</option>
+            <option value="Mengingatkan minum obat">Mengingatkan minum obat</option>
+            <option value="Membantu mandi">Membantu mandi</option>
+            <option value="Berpakaian dan makan">Berpakaian dan makan</option>
+            <option value="Membantu menyiapkan makanan">Membantu menyiapkan makanan</option>
+            <option value="Mengawasi pola makan">Mengawasi pola makan</option>
+            <option value="Mengingatkan waktu makan">Mengingatkan waktu makan</option>
+            <option value="Mendampingi senam ringan atau peregangan">Mendampingi senam ringan atau peregangan</option>
+            <option value="Latihan gerak">Latihan gerak</option>
+            <option value="Membantu berjalan didalam rumah">Membantu berjalan didalam rumah</option>
+            <option value="Pendampingan penggunaan alat bantu">Pendampingan penggunaan alat bantu</option>
+            <option value="Membersihkan area tempat tidur dan kamar">Membersihkan area tempat tidur dan kamar</option>
+            <option value="Menjaga rumah tetap aman dan nyaman">Menjaga rumah tetap aman dan nyaman</option>
+            <option value="Menata barang agar mudah dijangkau">Menata barang agar mudah dijangkau</option>
         </select>
     </div>
 
@@ -187,7 +187,7 @@
         canvas.width = img.width;
         canvas.height = img.height;
         // Penempatan awal box teks di tengah bawah
-        textX = canvas.width / 2;
+        textX = canvas.width / 4;
         textY = canvas.height - (canvas.height * 0.15);
         drawCanvas();
         downloadBtn.style.display = 'block';
@@ -268,13 +268,13 @@
             let badgeColor = '';
 
             if (currentStyle === 'orange') {
-                badgeText = 'Bersama Lansia';
+                badgeText = 'Bersama Lansia/Disabel';
                 badgeColor = '#e65100';
             } else if (currentStyle === 'red') {
-                badgeText = 'Membantu Lansia!';
+                badgeText = 'Membantu Lansia/Disable!';
                 badgeColor = '#b71c1c';
             } else if (currentStyle === 'yellow-media') {
-                badgeText = 'Kegiatan Lansia';
+                badgeText = 'Kegiatan Lansia/Disable';
                 badgeColor = '#f2a900';
             }
 
